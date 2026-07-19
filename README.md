@@ -8,7 +8,7 @@ Link para acessar os relatórios e planilha com os resultados dos testes: [relat
 
 ---
 
-## 1. Como rodar
+## 1. Como usar a solução
 
 ### 1.1 Pré-requisitos
 
@@ -16,18 +16,64 @@ Link para acessar os relatórios e planilha com os resultados dos testes: [relat
 - Git
 - Uma ferramenta de IA agêntica com execução de código (recomendado: Claude Code, Cursor, Antigravity ou Gemini CLI) — opcional, mas é o modo de uso pretendido desta solução
 
-### 1.2 Instalação
+### 1.2 Baixe o projeto
+
+Você pode clonar o repositório com Git:
 
 ```bash
 git clone https://github.com/Julia-cel/Analise-Automatizada-de-Testes-A-B.git
 cd Analise-Automatizada-de-Testes-A-B
+```
+
+Ou simplesmente clique em **Code → Download ZIP** na página do GitHub e extraia a pasta em seu computador.
+
+---
+
+## 1.3 Abra o projeto na ferramenta de IA
+
+Abra a pasta do projeto em uma ferramenta de IA com execução de código, como:
+
+- Cursor
+- Claude Code
+- Antigravity
+- Gemini CLI
+
+Essas ferramentas leem automaticamente o arquivo **AGENTES.md**, que contém as instruções para executar a solução.
+
+---
+
+### 1.4 Instale as dependências
+
+Abra o terminal integrado da própria ferramenta de IA e execute:
+
+```bash
 python -m venv venv
-venv\Scripts\Activate.ps1      # Windows (PowerShell)
-# source venv/bin/activate     # Mac/Linux
+```
+
+### Windows
+
+```bash
+venv\Scripts\Activate.ps1
+```
+
+### macOS / Linux
+
+```bash
+source venv/bin/activate
+```
+
+Depois instale as bibliotecas do projeto:
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 1.3 Configuração do Google Sheets (opcional, mas recomendado)
+> Essa etapa é necessária apenas na primeira utilização.
+
+---
+
+
+### 1.5 Configuração do Google Sheets 
 
 **Importante:** por segurança, a credencial da conta de serviço do Google
 **não está incluída neste repositório**. Comitar uma chave de API real em um
@@ -48,38 +94,51 @@ o Google Sheets precisa gerar a própria credencial, seguindo estes passos:
 
 **Sem esse passo, a solução continua funcionando normalmente** — a etapa de
 escrita no Sheets falha de forma controlada (aviso no terminal), sem
-interromper a geração do relatório. Os resultados já processados por esta
-submissão estão disponíveis em [RESULTADOS.md](RESULTADOS.md).
+interromper a geração do relatório. Os resultados do teste já inseridos automaticamente na planilha estão disponíveis em [RESULTADOS.md](RESULTADOS.md).
 
-### 1.4 Rodando via uma ferramenta de IA (uso pretendido)
+---
 
-Abra o projeto em uma ferramenta agêntica (Claude Code, Cursor, Antigravity,
-Gemini CLI). Essas ferramentas leem automaticamente o arquivo `AGENTES.md`
-na raiz do projeto, que contém as instruções de comportamento do agente.
-Basta pedir em linguagem natural, sem mencionar comandos ou nomes de
-arquivo:
+### 1.6 Execute uma análise
 
-```
-Analisa o teste do parceiro A
-```
-```
-Mostra o relatório do parceiro B
+Depois que o ambiente estiver preparado, basta enviar um dataset CSV para a IA e fazer um pedido em linguagem natural, por exemplo:
+
+```text
+Analise este teste A/B.
 ```
 
-O agente identifica o dataset correto, executa a pipeline, e responde com a
-recomendação e a justificativa. O relatório só é aberto automaticamente no
-navegador quando explicitamente solicitado ("mostra", "abre", "quero ver").
+ou
 
-### 1.5 Rodando diretamente pelo terminal
+```text
+Analise este dataset e me diga qual variante deve ser escalada.
+```
+O relatório só é aberto automaticamente no navegador quando explicitamente solicitado ("mostra", "abre", "quero ver").
+
+---
+
+### 1.7 Resultado esperado
+
+A solução executa automaticamente todo o pipeline de análise:
+
+- Limpeza e validação dos dados.
+- Cálculo das métricas do teste.
+- Testes estatísticos.
+- Aplicação das regras de decisão de negócio.
+- Geração da recomendação.
+- Criação de um relatório HTML para gestores.
+- Registro do resumo no Google Sheets (quando configurado).
+
+Ao final da execução, a IA responde no chat com a recomendação e disponibiliza o relatório completo,caso solicitado, gerado pela solução.
+
+---
+
+### Execução manual (opcional)
 
 ```bash
 python scripts/main.py datasets/dataset_01_parceiroA.csv
 python scripts/main.py datasets/dataset_01_parceiroA.csv --abrir   # também abre o relatório no navegador
 ```
 
-O comando funciona para qualquer um dos 3 datasets fornecidos, ou para um
-dataset novo, sem nenhuma alteração de código — a solução detecta
-automaticamente o parceiro, o período e o número de variantes do teste.
+A solução funciona com qualquer um dos datasets fornecidos no case ou com novos datasets que sigam o mesmo formato, identificando automaticamente o parceiro, o período analisado e as variantes presentes no teste.
 
 ---
 
@@ -87,23 +146,17 @@ automaticamente o parceiro, o período e o número de variantes do teste.
 
 ### 2.1 Sobre o uso de IA neste projeto
 
-Ferramentas de IA generativa foram utilizadas como apoio na escrita de
-código ao longo do desenvolvimento. A **arquitetura da solução** — a
-divisão de responsabilidades entre motor determinístico e camada
-conversacional, a metodologia estatística aplicada, a regra de decisão de
-negócio, e as escolhas de design descritas abaixo — foi definida, testada e
-validada por mim, com iterações sucessivas sobre casos reais dos datasets
-fornecidos.
+Ferramentas de IA generativa foram utilizadas na escrita de código ao longo do desenvolvimento. A **arquitetura da solução** — analisar o problema que a automação deveria resolver, o contexto da empresa, alinhar a solução com os objetivos de negócio, conduzir diversos testes para corrigir e identificar erros e decidir como a IA iria atuar nessa solução de forma ética e funcinal — foi definida e validada por mim. 
 
 ### 2.2 Por que essa arquitetura
 
-O princípio central do projeto é: **cálculo é sempre determinístico, a IA
-nunca calcula nada — só orquestra e interpreta.**
+Os princípios centrais do projeto foram:
+A implementação da solução deve ser simples o suficiente para que todos possam usar, mas ela também precisar gerar outputs exatos e confiáveis, por se tratar de métricas que vão influenciar a tomada de decisões na empresa. Para atender a esse requisito, a solução segue essa regra: **cálculo já é pré programado, a IA nunca calcula nada — só executa e interpreta — funcionando como uma ponte entre o código e o usuário final. **
 
 ```
 +-----------------------------------------------------------+
 |  Camada conversacional (AGENTES.md)                       |
-|  Traduz linguagem natural em execucao do main.py.         |
+|  Traduz linguagem natural em execução do main.py.         |
 |  Nunca reproduz calculos manualmente.                     |
 +---------------------------+--------------------------------+
                             |
@@ -117,12 +170,7 @@ nunca calcula nada — só orquestra e interpreta.**
   .py        tica.py                index)
 ```
 
-Essa separação existe para **reduzir erros**: modelos de linguagem não são
-confiáveis para aritmética e inferência estatística precisas. Isolando
-esses cálculos em funções Python puras (testáveis, determinísticas,
-auditáveis) e reservando a IA apenas para tradução de linguagem natural e
-orquestração, a solução elimina o risco de alucinação numérica no
-resultado final — o mesmo dataset sempre produz a mesma recomendação,
+Essa separação existe para **reduzir erros**: Seria muito arriscado deixar todos os cálculos nas responsabilidades de um modelo de linguagem natural, isso reduziria a padronização no método estatístico usado no Teste A/B e poderia resultar em valores incoerentes.   Isolando esses cálculos em funções Python puras e usando a IA apenas para tradução de linguagem natural e execução, a solução elimina o risco de alucinação numérica no resultado final — o mesmo dataset sempre produz a mesma recomendação,
 independente de qual ferramenta de IA está rodando por cima.
 
 O `AGENTES.md` funciona como o "manual de operação" do agente: ele
@@ -130,15 +178,15 @@ descreve exatamente quando e como cada script deve ser chamado, proibindo
 explicitamente que a IA calcule ou interprete o CSV diretamente. Isso torna
 a solução compatível com qualquer ferramenta agêntica (Claude Code, Cursor,
 Antigravity, Gemini CLI, GPT personalizado) sem exigir nenhuma integração
-específica de código — a "inteligência" de orquestração está no arquivo de
-instruções, não amarrada a uma API de IA específica.
+específica de código — a forma como a solução irá funcionar está no arquivo de
+instruções, não ligada a uma API de IA específica.
 
 ### 2.3 Metodologia estatística
 
 - **Teste**: teste t de Welch (`scipy.stats.ttest_ind`, `equal_var=False`), comparando cada variante contra o grupo controle
 - **Nível de significância**: 5% (p < 0.05)
-- **Amostra mínima**: comparações com menos de 2 observações por grupo são sinalizadas como "dados insuficientes", não descartadas silenciosamente
-- **Métrica de decisão**: margem (comissão − cashback) é o critério primário — cashback mais alto costuma aumentar volume, mas pode destruir rentabilidade, por isso volume isolado não é suficiente para recomendar escala
+- **Amostra mínima**: comparações com menos de 2 observações por grupo são sinalizadas como "dados insuficientes".
+- **Métrica de decisão**: margem (comissão − cashback) é o critério primário — cashback mais alto costuma aumentar volume de compradores e venda, mas pode destruir rentabilidade, por isso volume isolado não é suficiente para recomendar escala
 - **Regra de decisão**:
   1. Se a margem piora com significância estatística → variante descartada, independente das demais métricas
   2. Se a margem melhora com significância → variante é candidata forte
@@ -173,5 +221,7 @@ instruções, não amarrada a uma API de IA específica.
 
 ## 3. Limitações conhecidas
 
-- A integração com Google Sheets requer credencial própria (seção 1.3); sem ela, a análise e o relatório continuam sendo gerados normalmente
-- Links de relatório publicados no GitHub (`htmlpreview.github.io`) só ficam ativos após o `git push` do arquivo correspondente — para análises novas rodadas localmente, o relatório está imediatamente disponível no computador de quem executou, mas o link público exige publicação manual
+- A integração com Google Sheets requer que o usuário crie credencial própria (seção 1.3); sem ela, a análise e o relatório continuam sendo gerados normalmente
+- O usuário ainda terá que instalar Python, git e rodar algumas linhas de código para preparar o ambiente para a IA usar a solução.
+  Como próximos passos, o objetivo é que a solução evolua para funcionar de acordo com o padrão Model Context Protocol, fazendo da          solução uma Tool para a Inteligência Artificial.
+- Links de relatório html publicados no GitHub (`htmlpreview.github.io`) só ficam ativos após o `git push` do arquivo correspondente — para análises novas rodadas localmente, o relatório está imediatamente disponível no computador de quem executou, mas o link público exige publicação manual
