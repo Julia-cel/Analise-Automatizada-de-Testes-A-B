@@ -4,7 +4,7 @@ Solução reutilizável que recebe os dados de um teste A/B de cashback e
 retorna uma análise estatística completa e uma recomendação de negócio
 acionável: **qual variante escalar para 100% do tráfego**.
 
-Resultados já processados: [RESULTADOS.md](RESULTADOS.md) · [Planilha de acompanhamento](https://docs.google.com/spreadsheets/d/11rUTDzbcHEF8QNlcwO-CyvkuN9OfuupikytPEfyMVzk/edit?usp=sharing)
+Link para acessar os relatórios e planilha com os resultados dos testes: [relatorios.md](relatorios.md) · [Planilha de acompanhamento](https://docs.google.com/spreadsheets/d/11rUTDzbcHEF8QNlcwO-CyvkuN9OfuupikytPEfyMVzk/edit?usp=sharing)
 
 ---
 
